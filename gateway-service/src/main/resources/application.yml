@@ -1,0 +1,63 @@
+# 서버 포트 설정
+server:
+  port: 8080
+
+spring:
+  application:
+    # 애플리케이션 이름 설정
+    name: gateway-service
+
+  cloud:
+    gateway:
+      # 라우팅 규칙 정의
+      routes:
+        # 인증 관련 요청 라우팅 (/auth/**)
+        - id: auth-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+
+        # 사용자 관련 요청 라우팅 (/user/**)
+        - id: user-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/user/**
+          filters:
+            - JwtFilter  # JWT 인증 필터 적용
+
+        # 테스트 관련 요청 라우팅 (/test/**)
+        - id: test-route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/test/**
+          filters:
+            - JwtFilter  # JWT 인증 필터 적용
+
+      # 모든 라우트에 적용될 기본 필터
+      default-filters:
+        # CORS 관련 중복 헤더 제거
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+  web:
+    resources:
+      # 정적 리소스 매핑 비활성화
+      add-mappings: false
+
+# JWT 설정
+jwt:
+  secret: 7nepDBvcmydW2xwfhL0Dk9qiPWq9pYtGKVQoncHP8Ok=
+  expiration: 3600000  # 토큰 만료 시간: 1시간 (밀리초 단위)
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    com.example.gatewayservice: DEBUG
+    com.example.gatewayservice.filter: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    io.jsonwebtoken: DEBUG
+    org.springframework.http.server.reactive: DEBUG
+    reactor.netty: INFO
+    io.netty: INFO
