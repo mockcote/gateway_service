@@ -23,7 +23,7 @@ spring:
           predicates:
             - Path=/user/**
           filters:
-            - JwtFilter  # JWT 인증 필터 적용
+            - JwtAuthenticationFilter  # JWT 인증 필터 적용
 
         # 테스트 관련 요청 라우팅 (/test/**)
         - id: test-route
@@ -31,7 +31,7 @@ spring:
           predicates:
             - Path=/test/**
           filters:
-            - JwtFilter  # JWT 인증 필터 적용
+            - JwtAuthenticationFilter  # JWT 인증 필터 적용
 
       # 모든 라우트에 적용될 기본 필터
       default-filters:
