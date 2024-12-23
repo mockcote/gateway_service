@@ -27,7 +27,7 @@ spring:
         - id: user-find-route
           uri: http://localhost:8081
           predicates:
-            - Path=/user/find/**
+            - Path=/user/find/all
             
         # 사용자 관련 요청 라우팅 (/user/**)
         - id: user-route
@@ -58,7 +58,7 @@ spring:
 # JWT 설정
 jwt:
   secret: 7nepDBvcmydW2xwfhL0Dk9qiPWq9pYtGKVQoncHP8Ok=
-  expiration: 3600000  # 토큰 만료 시간: 1시간 (밀리초 단위)
+  expiration: 3600000 # 토큰 만료 시간: 1시간 (밀리초 단위)
 
 # 로깅 설정
 logging:
