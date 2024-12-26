@@ -11,7 +11,8 @@ public class AllowedUriConfig {
     private final List<String> allowedUris = List.of(
         "/auth/**", // 인증 관련 경로
         "/user/**", // 사용자 관련 경로
-        "/test/**"  // 테스트 관련 경로
+        "/test/**",  // 테스트 관련 경로
+        "/stats/**" // 통계 관련 경로
     );
 
     public List<String> getAllowedUris() {

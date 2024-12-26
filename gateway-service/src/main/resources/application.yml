@@ -45,6 +45,13 @@ spring:
           filters:
             - JwtAuthenticationFilter  # JWT 인증 필터 적용
 
+        # 통계 관련 요청 라우팅 (/stats/**)
+        - id: stat-route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/stats/**
+          # JWT 인증 필터 적용해야함 (임시로 x)
+
       # 모든 라우트에 적용될 기본 필터
       default-filters:
         # CORS 관련 중복 헤더 제거
