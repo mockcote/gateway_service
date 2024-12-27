@@ -27,7 +27,6 @@ public class SecurityConfig {
         return http
                 // CSRF 보호 기능 비활성화 (REST API 서버에서는 일반적으로 비활성화)
                 .csrf(csrf -> csrf.disable())
-                
                 // Stateless 설정: 서버에서 세션을 사용하지 않도록 설정 (JWT 기반 인증에 적합)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 
