@@ -33,34 +33,41 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
         return (exchange, chain) -> {
             logger.debug("Incoming request: {}", exchange.getRequest().getURI()); // 요청 URI 로깅
 
-            String token = resolveToken(exchange); // **HTTP 헤더에서 JWT 추출**
-            if (token != null) {
-                logger.debug("Extracted token: {}", token); // 추출한 토큰 로깅
+            String accessToken = resolveToken(exchange); // **HTTP 헤더에서 Access Token 추출**
 
-                if (jwtProvider.validateToken(token)) { // **토큰 유효성 검증**
-                    logger.debug("Token is valid."); // 유효한 토큰 로깅
-                    Claims claims = jwtProvider.getClaims(token); // **JWT 클레임 추출**
-                    logger.debug("Extracted claims: {}", claims); // 추출한 클레임 로깅
+            // Access Token이 없으면 401 반환
+            if (accessToken == null) {
+                logger.warn("No Access Token found in the request."); // Access Token 없음 로깅
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
+            logger.debug("Extracted Access Token: {}", accessToken); // Access Token 로깅
+
+            // Access Token 유효성 검증
+            try {
+                if (jwtProvider.validateToken(accessToken)) { // Access Token이 유효한 경우
+                    logger.debug("Access Token is valid."); // 유효한 Access Token 로깅
+                    Claims claims = jwtProvider.getClaims(accessToken); // **JWT 클레임 추출**
+                    logger.debug("Extracted claims: {}", claims); // 클레임 로깅
 
                     // **X-Authenticated-User 헤더 추가**
                     ServerHttpRequest modifiedRequest = exchange.getRequest()
-                            .mutate() // 요청을 수정하기 위한 메서드 호출
-                            .header("X-Authenticated-User", claims.getSubject()) // 클레임에서 사용자 정보를 가져와 헤더에 추가
-                            .build(); // 수정된 요청 객체 생성
-
-                    logger.debug("Added X-Authenticated-User header: {}", claims.getSubject()); // 추가된 헤더 로깅
+                            .mutate()
+                            .header("X-Authenticated-User", claims.getSubject()) // 사용자 정보 헤더에 추가
+                            .build();
 
                     // **수정된 요청으로 체인 실행**
-                    return chain.filter(exchange.mutate().request(modifiedRequest).build()); // 수정된 요청으로 필터 체인 실행
+                    return chain.filter(exchange.mutate().request(modifiedRequest).build());
                 } else {
-                    logger.warn("Token validation failed."); // 토큰 검증 실패 로깅
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // 401 Unauthorized 응답 설정
-                    return exchange.getResponse().setComplete(); // 응답 완료
+                    logger.warn("Access Token is invalid."); // 유효하지 않은 Access Token 로깅
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().setComplete();
                 }
-            } else {
-                logger.warn("No valid token found in the request."); // 유효한 토큰이 없음을 로깅
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED); // 401 Unauthorized 응답 설정
-                return exchange.getResponse().setComplete(); // 응답 완료
+            } catch (Exception e) {
+                logger.warn("Access Token validation failed: {}", e.getMessage()); // 검증 실패 로깅
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
             }
         };
     }
@@ -68,7 +75,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     // HTTP 요청에서 JWT를 추출하는 메서드
     private String resolveToken(ServerWebExchange exchange) {
         String bearerToken = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION); // Authorization 헤더에서 토큰 추출
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) { 
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             logger.debug("Authorization header found: {}", bearerToken); // Authorization 헤더 존재 로깅
             return bearerToken.substring(7); // **"Bearer " 제거 후 토큰 반환**
         }
