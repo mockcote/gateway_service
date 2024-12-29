@@ -4,10 +4,23 @@ server:
 
 spring:
   application:
+    # 애플리케이션 이름 설정
     name: gateway-service
 
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders:
+              - "*"  # 모든 헤더 허용
+            allowCredentials: true
       # 라우팅 규칙 정의
       routes:
         # 인증 관련 요청 라우팅 (/auth/**)
@@ -21,46 +34,46 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/user/join/**
-            
+
         # 사용자 조회 요청 라우팅 (JWT 인증 안되도록)
         - id: user-find-route
           uri: http://localhost:8081
           predicates:
             - Path=/user/find/all
-            
+
         # 사용자 관련 요청 라우팅 (/user/**)
         - id: user-route
           uri: http://localhost:8081
           predicates:
             - Path=/user/**
           filters:
-            - JwtAuthenticationFilter  # JWT 인증 필터 적용
+            - JwtAuthenticationFilter # JWT 인증 필터 적용 (필터 이름 수정)
 
         # 테스트 관련 요청 라우팅 (/test/**)
-#        - id: test-route
-#          uri: http://localhost:8082
-#          predicates:
-#            - Path=/test/**
-#          filters:
-#            - JwtAuthenticationFilter  # JWT 인증 필터 적용
+        - id: test-route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/test/**
+          filters:
+            - JwtAuthenticationFilter # JWT 인증 필터 적용 (필터 이름 수정)
 
         # 통계 관련 요청 라우팅 (/stats/**)
         - id: stat-route
           uri: http://localhost:8082
           predicates:
             - Path=/stats/**
-          # JWT 인증 필터 적용해야함 (임시로 x)
 
         # 문제 관련 요청 라우팅 (/problems/**)
         - id: problem-route
           uri: http://localhost:8083
           predicates:
-            - Path=/problems/**  # 게이트웨이 경로
+            - Path=/problems/**
           filters:
-            - StripPrefix=1  # "/problems"를 제거하고 백엔드로 전달
+            - StripPrefix=1
 
       # 모든 라우트에 적용될 기본 필터
       default-filters:
+        # CORS 관련 중복 헤더 제거
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
   web:
