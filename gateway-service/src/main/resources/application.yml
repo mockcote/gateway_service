@@ -62,6 +62,8 @@ spring:
           uri: http://localhost:8082
           predicates:
             - Path=/stats/**
+          filters:
+            - JwtAuthenticationFilter
 
         # 문제 관련 요청 라우팅 (/problems/**)
         - id: problem-route
