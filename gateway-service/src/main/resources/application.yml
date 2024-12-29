@@ -1,3 +1,4 @@
+# 서버 포트 설정
 server:
   port: 8080
 
@@ -7,67 +8,72 @@ spring:
 
   cloud:
     gateway:
+      # 라우팅 규칙 정의
       routes:
-        # 인증 관련 요청 라우팅
+        # 인증 관련 요청 라우팅 (/auth/**)
         - id: auth-route
           uri: http://localhost:8081
           predicates:
             - Path=/auth/**
 
-        # 사용자 회원가입 요청 라우팅
+        # 사용자 회원가입 요청 라우팅 (JWT 인증 안되도록)
         - id: user-join-route
           uri: http://localhost:8081
           predicates:
             - Path=/user/join/**
-
-        # 사용자 조회 요청 라우팅
+            
+        # 사용자 조회 요청 라우팅 (JWT 인증 안되도록)
         - id: user-find-route
           uri: http://localhost:8081
           predicates:
             - Path=/user/find/all
-
-        # 사용자 관련 요청 라우팅
+            
+        # 사용자 관련 요청 라우팅 (/user/**)
         - id: user-route
           uri: http://localhost:8081
           predicates:
             - Path=/user/**
           filters:
-            - JwtAuthenticationFilter
+            - JwtAuthenticationFilter  # JWT 인증 필터 적용
 
-        # 테스트 관련 요청 라우팅
-        - id: test-route
-          uri: http://localhost:8082
-          predicates:
-            - Path=/test/**
-          filters:
-            - JwtAuthenticationFilter
+        # 테스트 관련 요청 라우팅 (/test/**)
+#        - id: test-route
+#          uri: http://localhost:8082
+#          predicates:
+#            - Path=/test/**
+#          filters:
+#            - JwtAuthenticationFilter  # JWT 인증 필터 적용
 
-        # 통계 관련 요청 라우팅
+        # 통계 관련 요청 라우팅 (/stats/**)
         - id: stat-route
           uri: http://localhost:8082
           predicates:
             - Path=/stats/**
-          # JWT 인증 필터 적용 예정 (임시로 비활성화)
+          # JWT 인증 필터 적용해야함 (임시로 x)
 
-        # 문제 관련 요청 라우팅
+        # 문제 관련 요청 라우팅 (/problems/**)
         - id: problem-route
           uri: http://localhost:8083
           predicates:
-            - Path=/problems/**
+            - Path=/problems/**  # 게이트웨이 경로
           filters:
-            - JwtAuthenticationFilter
+            - StripPrefix=1  # "/problems"를 제거하고 백엔드로 전달
 
+      # 모든 라우트에 적용될 기본 필터
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
 
   web:
     resources:
+      # 정적 리소스 매핑 비활성화
       add-mappings: false
 
+# JWT 설정
 jwt:
   secret: 7nepDBvcmydW2xwfhL0Dk9qiPWq9pYtGKVQoncHP8Ok=
-  expiration: 3600000 # 1시간
+  expiration: 3600000 # 토큰 만료 시간: 1시간 (밀리초 단위)
 
+# 로깅 설정
 logging:
   level:
     root: INFO
