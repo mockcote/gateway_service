@@ -62,8 +62,6 @@ spring:
           uri: http://localhost:8082
           predicates:
             - Path=/stats/**
-          filters:
-            - JwtAuthenticationFilter
 
         # 문제 관련 요청 라우팅 (/problems/**)
         - id: problem-route
@@ -72,6 +70,14 @@ spring:
             - Path=/problems/**
           filters:
             - StripPrefix=1
+
+        # 문제풀이 관련 요청 라우팅 (/submissions/**)
+        - id: time-route
+          uri: http://localhost:8084
+          predicates:
+            - Path=/submissions/**
+          filters:
+            - JwtAuthenticationFilter # JWT 인증 필터 적용 (필터 이름 수정)
 
       # 모든 라우트에 적용될 기본 필터
       default-filters:

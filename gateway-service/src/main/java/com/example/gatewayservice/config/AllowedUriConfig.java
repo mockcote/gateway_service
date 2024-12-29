@@ -13,7 +13,8 @@ public class AllowedUriConfig {
         "/user/**", // 사용자 관련 경로
         "/test/**",  // 테스트 관련 경로
         "/stats/**", // 통계 관련 경로
-        "/problems/**" //문제 관련 경로
+        "/problems/**", //문제 관련 경로
+        "/submissions/**" //문제풀이 관련 경로
     );
 
     public List<String> getAllowedUris() {
