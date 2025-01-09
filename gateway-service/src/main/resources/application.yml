@@ -1,6 +1,11 @@
 # 서버 포트 설정
 server:
   port: 8080
+  ssl:
+    enabled: true
+    key-store: /etc/letsencrypt/live/mockcote.site/keystore.p12
+    key-store-type: PKCS12
+    key-store-password: mockcotepassword
 
 backend:
   host: 10.0.3.2
