@@ -44,7 +44,7 @@ spring:
           predicates:
             - Path=/auth/**
           filters:
-            - RewriteResponseHeader=Set-Cookie,(.*),$1; SameSite=None
+            - RewriteResponseHeader=Set-Cookie,(.*),$1; Secure; SameSite=None
             - PreserveHostHeader
 
         # 사용자 회원가입 요청 라우팅 (/user/join/**)
