@@ -20,11 +20,11 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
+                .csrf(ServerHttpSecurity.CsrfSpec::disable) // CSRF 보호 비활성화
                 .cors(cors -> cors.configurationSource(request -> {
-                    // CORS 설정
                     org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
-                    config.addAllowedOriginPattern("*"); // 모든 도메인 허용
+                    config.addAllowedOrigin("https://mockcote.site"); // 명시적인 도메인 허용
+                    config.addAllowedOrigin("https://subdomain.mockcote.site");
                     config.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
                     config.addAllowedHeader("*"); // 모든 헤더 허용
                     config.setAllowCredentials(true); // 쿠키 허용
