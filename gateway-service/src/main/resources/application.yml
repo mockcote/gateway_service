@@ -22,9 +22,8 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-#            allowedOrigins:
-#              - "http://localhost:3000"  # 개발 환경
-#              - "14.43.64.132"  # 배포 환경
+            allowedOrigins:
+              - "*"  # 개발 환경
             allowedOriginPatterns:
               - "*"
             allowedMethods:
