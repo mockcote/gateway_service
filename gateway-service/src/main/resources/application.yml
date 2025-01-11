@@ -65,8 +65,6 @@ spring:
           uri: http://${backend.host}:8081
           predicates:
             - Path=/user/join/**
-          filters:
-            - SetRequestBody={}
           metadata:
             response-timeout: 20000
             connect-timeout: 20000
@@ -76,8 +74,6 @@ spring:
           uri: http://${backend.host}:8081
           predicates:
             - Path=/user/find/all
-          filters:
-            - SetRequestBody={}
           metadata:
             response-timeout: 20000
             connect-timeout: 20000
@@ -109,8 +105,6 @@ spring:
           uri: http://${backend.host}:8082
           predicates:
             - Path=/stats/**
-          filters:
-            - SetRequestBody={}
           metadata:
             response-timeout: 20000
             connect-timeout: 20000
@@ -122,7 +116,6 @@ spring:
             - Path=/problems/**
           filters:
             - StripPrefix=1
-            - SetRequestBody={}
           metadata:
             response-timeout: 20000
             connect-timeout: 20000
