@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
                     config.addAllowedOrigin("https://mockcote.site"); // 명시적인 도메인 허용
-                    config.addAllowedOrigin("https://subdomain.mockcote.site");
+                    config.addAllowedOrigin("https://*.mockcote.site");
                     config.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
                     config.addAllowedHeader("*"); // 모든 헤더 허용
                     config.setAllowCredentials(true); // 쿠키 허용
