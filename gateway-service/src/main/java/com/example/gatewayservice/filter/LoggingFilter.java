@@ -1,5 +1,7 @@
 package com.example.gatewayservice.filter;
 
+import java.nio.charset.StandardCharsets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -10,10 +12,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class LoggingFilter implements GlobalFilter {
@@ -21,11 +22,15 @@ public class LoggingFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 요청 정보 로깅
         log.info("Request Path: {}", exchange.getRequest().getPath());
         log.info("HTTP Method: {}", exchange.getRequest().getMethod());
         log.info("Query Params: {}", exchange.getRequest().getQueryParams());
         log.info("Headers: {}", exchange.getRequest().getHeaders());
+
+        // ✅ GET 요청일 경우 Body를 읽지 않고 바로 체인 실행
+        if (exchange.getRequest().getMethod().matches("GET")) {
+            return chain.filter(exchange);
+        }
 
         // 요청 Body 처리
         return DataBufferUtils.join(exchange.getRequest().getBody())
@@ -33,13 +38,9 @@ public class LoggingFilter implements GlobalFilter {
                     String body = StandardCharsets.UTF_8.decode(dataBuffer.asByteBuffer()).toString();
                     log.info("Request Body: {}", body);
 
-                    // DataBuffer 복제
                     DataBuffer cachedBuffer = exchange.getResponse().bufferFactory().wrap(body.getBytes(StandardCharsets.UTF_8));
-
-                    // 기존 DataBuffer 해제
                     DataBufferUtils.release(dataBuffer);
 
-                    // 새로운 ServerHttpRequest 생성
                     ServerHttpRequest mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {
                         @Override
                         public Flux<DataBuffer> getBody() {
@@ -47,12 +48,7 @@ public class LoggingFilter implements GlobalFilter {
                         }
                     };
 
-                    // 변환된 ServerWebExchange 생성
-                    ServerWebExchange mutatedExchange = exchange.mutate()
-                            .request(mutatedRequest)
-                            .build();
-
-                    return chain.filter(mutatedExchange);
+                    return chain.filter(exchange.mutate().request(mutatedRequest).build());
                 });
     }
 }
