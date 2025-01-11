@@ -96,9 +96,11 @@ spring:
             - JwtAuthenticationFilter
 
       # 모든 라우트에 적용될 기본 필터
-#      default-filters:
-#        # 중복된 CORS 헤더 제거
-#        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      default-filters:
+        # 중복된 CORS 헤더 제거
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+        - RewriteResponseHeader=Set-Cookie,(.*),$1; Secure; SameSite=None
+        - PreserveHostHeader
 
   web:
     resources:
