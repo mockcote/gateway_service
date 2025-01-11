@@ -19,6 +19,7 @@ spring:
 
   cloud:
     gateway:
+      forwarded-header-strategy: framework
       globalcors:
         cors-configurations:
           '[/**]':
@@ -99,8 +100,8 @@ spring:
       default-filters:
         # 중복된 CORS 헤더 제거
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
-        - RewriteResponseHeader=Set-Cookie,(.*),$1; Secure; SameSite=None
         - PreserveHostHeader
+        - AddRequestHeader=Content-Type, application/json
 
   web:
     resources:
