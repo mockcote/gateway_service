@@ -28,7 +28,7 @@ public class LoggingFilter implements GlobalFilter {
         log.info("Headers: {}", exchange.getRequest().getHeaders());
 
         // ✅ GET 요청일 경우 Body를 읽지 않고 바로 체인 실행
-        if (exchange.getRequest().getMethod().matches("GET")) {
+        if (exchange.getRequest().getMethod().matches("GET") || exchange.getRequest().getMethod().matches("POST")) {
             return chain.filter(exchange);
         }
 
